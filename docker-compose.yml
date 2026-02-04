@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres_app
+    environment:
+      POSTGRES_USER: app_pg_user
+      POSTGRES_PASSWORD: app_pg_password
+      POSTGRES_DB: app_pg_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - app_pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  app_pg_data:
