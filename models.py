@@ -12,6 +12,8 @@ class User(Base):
   email = Column(String, nullable=False, unique=True)
   name = Column(String, nullable=False)
 
+  notes = relationship('Note', back_populates='users')
+
 class Note(Base):
   __tablename__ = 'notes'
   id = Column(Integer, primary_key=True)
