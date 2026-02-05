@@ -1,0 +1,22 @@
+# USERS & NOTES MODELS
+
+from sqlalchemy import Integer, String, Column, ForeignKey
+from sqlalchemy.orm import declarative_base, relationship
+from database import engine
+
+Base = declarative_base()
+
+class User(Base):
+  __tablename__ = 'users'
+  id = Column(Integer, primary_key=True)
+  email = Column(String, nullable=False, unique=True)
+  name = Column(String, nullable=False)
+
+class Note(Base):
+  __tablename__ = 'notes'
+  id = Column(Integer, primary_key=True)
+  title = Column(String, nullable=False)
+  content = Column(String)
+  user_id = Column(Integer, ForeignKey('users.id'))
+
+  users = relationship('User', back_populates='notes')
