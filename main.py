@@ -40,3 +40,12 @@ def add_note(create_note: CreateNote, db: Session = Depends(get_db)):
   db.commit()
   db.refresh(new_note)
   return new_note
+
+@app.put("/note_content/{id}")
+def update_note_content(id: int, update_note_content: UpdateNoteContent, db: Session = Depends(get_db)):
+  updated_note = db.query(Note).filter(Note.id == id).first()
+  updated_note.content = update_note_content.content
+  db.commit()
+  db.refresh(updated_note)
+  return updated_note
+# TO DO LATER: dodać obsługę, gdyby updated_note nie zostało znalezione
