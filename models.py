@@ -12,7 +12,7 @@ class User(Base):
   email = Column(String, nullable=False, unique=True)
   name = Column(String, nullable=False)
 
-  notes = relationship('Note', back_populates='users')
+  notes = relationship('Note', back_populates='user')
 
 class Note(Base):
   __tablename__ = 'notes'
@@ -21,4 +21,4 @@ class Note(Base):
   content = Column(String)
   user_id = Column(Integer, ForeignKey('users.id'))
 
-  users = relationship('User', back_populates='notes')
+  user = relationship('User', back_populates='notes')

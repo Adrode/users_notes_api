@@ -1,7 +1,8 @@
 # ENDPOINTY
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from models import Base, User, Note
 from database import engine, get_db
 from schemas import CreateUser, CreateNote, UpdateNoteContent
@@ -24,12 +25,17 @@ def get_user(id: int, db: Session = Depends(get_db)):
 
 @app.post("/users")
 def add_user(create_user: CreateUser, db: Session = Depends(get_db)):
-  new_user = User(email=create_user.email, name=create_user.name)
-  db.add(new_user)
-  db.commit()
-  db.refresh(new_user)
-  return new_user
-# TO DO LATER: exception_handler na wypadek podania danych, które nie mogą zostać dodane do tabeli ze względu na unique albo inny contstraint
+  try:
+    new_user = User(email=create_user.email, name=create_user.name)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+  except IntegrityError:
+    raise HTTPException(
+      status_code=400,
+      detail="Unique constraint violated"
+    )
 
 # NOTES ENDPOINTS
 
@@ -58,4 +64,10 @@ def update_note_content(id: int, update_note_content: UpdateNoteContent, db: Ses
   db.commit()
   db.refresh(updated_note)
   return updated_note
-# TO DO LATER: dodać obsługę, gdyby updated_note nie zostało znalezione
+
+# JOINED ENDPOINTS
+
+@app.get("/users_notes")
+def get_users_notes(db: Session = Depends(get_db)):
+  users_notes = db.query(User.name, Note.title, Note.content).join(Note).all()
+  return [{'name': element.name, 'title': element.title, 'content': element.content} for element in users_notes]
