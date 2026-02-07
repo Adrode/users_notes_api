@@ -1,10 +1,10 @@
 # PYDANTIC SCHEMAS
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 class CreateUser(BaseModel):
-  email: str
+  email: EmailStr
   name: str
 
 class CreateNote(BaseModel):
