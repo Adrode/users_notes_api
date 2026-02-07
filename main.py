@@ -73,6 +73,19 @@ def update_note_content(id: int, update_note_content: UpdateNoteContent, db: Ses
 # JOINED ENDPOINTS
 
 @app.get("/users_notes")
-def get_users_notes(db: Session = Depends(get_db)):
+def get_all_users_notes(db: Session = Depends(get_db)):
   users_notes = db.query(User.name, Note.title, Note.content).join(Note).all()
-  return [{'name': element.name, 'title': element.title, 'content': element.content} for element in users_notes]
+  return [{'user_name': element.name, 'note_title': element.title, 'note_content': element.content} for element in users_notes]
+
+@app.get("/users/{id}/notes")
+def get_user_notes(id: int, db: Session = Depends(get_db)):
+  user = db.query(User).filter(User.id == id).first()
+
+  if not user:
+    raise HTTPException(
+      status_code=404,
+      detail="ID not found"
+    )
+  
+  return {'user_name': user.name, 'notes': user.notes}
+# TO DO LATER: poprawić wyświetlanie danych notes, żeby zwracało tylko title i content
