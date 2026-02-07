@@ -57,9 +57,16 @@ def add_note(create_note: CreateNote, db: Session = Depends(get_db)):
   db.refresh(new_note)
   return new_note
 
-@app.put("/note_content/{id}")
+@app.put("/notes/{id}")
 def update_note_content(id: int, update_note_content: UpdateNoteContent, db: Session = Depends(get_db)):
   updated_note = db.query(Note).filter(Note.id == id).first()
+
+  if not updated_note:
+    raise HTTPException(
+      status_code=404,
+      detail="ID not found"
+    )
+
   updated_note.content = update_note_content.content
   db.commit()
   db.refresh(updated_note)
