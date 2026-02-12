@@ -87,5 +87,4 @@ def get_user_notes(id: int, db: Session = Depends(get_db)):
       detail="ID not found"
     )
   
-  return {'user_name': user.name, 'notes': user.notes}
-# TO DO LATER: poprawić wyświetlanie danych notes, żeby zwracało tylko title i content
+  return {'user_name': user.name, 'notes': [{'title': element.title, 'content': element.content} for element in user.notes]}
