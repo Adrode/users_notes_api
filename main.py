@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models import Base, User, Note
 from database import engine, get_db
-from schemas import CreateUser, CreateNote, UpdateNoteContent
+from schemas import CreateUser, CreateNote, UpdateNoteContent, UpdateNoteUserId
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,7 +18,7 @@ def get_users(db: Session = Depends(get_db)):
 
 @app.get("/users/{id}")
 def get_user(id: int, db: Session = Depends(get_db)):
-  user = db.query(User).filter(User.id == id).first()
+  user = db.query(User).where(User.id == id).first()
   return user
 
 @app.post("/users")
@@ -44,7 +44,7 @@ def get_notes(db: Session = Depends(get_db)):
 
 @app.get("/notes/{id}")
 def get_note(id: int, db: Session = Depends(get_db)):
-  note = db.query(Note).filter(Note.id == id).first()
+  note = db.query(Note).where(Note.id == id).first()
   return note
 
 @app.post("/notes")
@@ -57,7 +57,7 @@ def add_note(create_note: CreateNote, db: Session = Depends(get_db)):
 
 @app.put("/notes/{id}")
 def update_note_content(id: int, update_note_content: UpdateNoteContent, db: Session = Depends(get_db)):
-  updated_note = db.query(Note).filter(Note.id == id).first()
+  updated_note = db.query(Note).where(Note.id == id).first()
 
   if not updated_note:
     raise HTTPException(
@@ -79,7 +79,7 @@ def get_all_users_notes(db: Session = Depends(get_db)):
 
 @app.get("/users/{id}/notes")
 def get_user_notes(id: int, db: Session = Depends(get_db)):
-  user = db.query(User).filter(User.id == id).first()
+  user = db.query(User).where(User.id == id).first()
 
   if not user:
     raise HTTPException(
@@ -88,3 +88,18 @@ def get_user_notes(id: int, db: Session = Depends(get_db)):
     )
   
   return {'user_name': user.name, 'notes': [{'title': element.title, 'content': element.content} for element in user.notes]}
+
+@app.put("/notes/{id}/users")
+def update_note_user_id(id: int, update_user_id: UpdateNoteUserId, db: Session = Depends(get_db)):
+  note = db.query(Note).where(Note.id == id).first()
+
+  if not note:
+    raise HTTPException(
+      status_code=404,
+      detail="ID not found"
+    )
+  
+  note.user_id = update_user_id.user_id
+  db.commit()
+  db.refresh(note)
+  return note

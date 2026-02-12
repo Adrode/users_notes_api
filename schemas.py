@@ -14,3 +14,6 @@ class CreateNote(BaseModel):
 
 class UpdateNoteContent(BaseModel):
   content: Optional[str] = None
+
+class UpdateNoteUserId(BaseModel):
+  user_id: Optional[int] = None
