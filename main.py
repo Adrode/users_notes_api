@@ -50,6 +50,13 @@ def get_note(id: int, db: Session = Depends(get_db)):
 @app.post("/notes")
 def add_note(create_note: CreateNote, db: Session = Depends(get_db)):
   new_note = Note(title=create_note.title, content=create_note.content, user_id=create_note.user_id)
+
+  if not db.query(User).where(User.id == new_note.user_id).first():
+    raise HTTPException(
+      status_code=404,
+      detail="User ID not found"
+    )
+
   db.add(new_note)
   db.commit()
   db.refresh(new_note)

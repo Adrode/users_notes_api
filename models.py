@@ -18,7 +18,7 @@ class Note(Base):
   __tablename__ = 'notes'
   id = Column(Integer, primary_key=True)
   title = Column(String, nullable=False)
-  content = Column(String)
-  user_id = Column(Integer, ForeignKey('users.id'))
+  content = Column(String, nullable=True)
+  user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
 
   user = relationship('User', back_populates='notes')
