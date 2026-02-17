@@ -70,6 +70,20 @@ def update_note_content(id: int, update_note_content: UpdateNoteContent, db: Ses
   db.refresh(updated_note)
   return updated_note
 
+@app.delete("/notes/{id}")
+def delete_note(id: int, db: Session = Depends(get_db)):
+  note_to_delete = db.query(Note).where(Note.id == id).first()
+
+  if not note_to_delete:
+    raise HTTPException(
+      status_code=404,
+      detail="ID not found"
+    )
+
+  db.delete(note_to_delete)
+  db.commit()
+  return note_to_delete
+
 # JOINED ENDPOINTS
 
 @app.get("/users_notes")
