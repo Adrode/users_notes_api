@@ -47,3 +47,20 @@ def get_user_notes(id: int, db: Session = Depends(get_db)):
     )
   
   return {'user_name': user.name, 'notes': [{'title': element.title, 'content': element.content} for element in user.notes]}
+
+@router.delete("/{id}")
+def delete_user(id: int, db: Session = Depends(get_db)):
+  user_to_delete = db.query(User).where(User.id == id).first()
+  notes = db.query(Note).where(Note.user_id == id).all()
+
+  if not user_to_delete:
+    raise HTTPException(
+      status_code=404,
+      detail="ID not found"
+    )
+  
+  db.delete(user_to_delete)
+  for note in notes:
+    note.user_id = None
+  db.commit()
+  return user_to_delete
