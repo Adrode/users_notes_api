@@ -1,5 +1,3 @@
-# USERS & NOTES MODELS
-
 from sqlalchemy import Integer, String, Column, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 from database import engine

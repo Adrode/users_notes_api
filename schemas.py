@@ -1,5 +1,3 @@
-# PYDANTIC SCHEMAS
-
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
