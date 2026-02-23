@@ -57,7 +57,6 @@ def add_user(create_user: CreateUser, db: Session = Depends(get_db)):
 @router.delete("/{id}")
 def delete_user(id: int, db: Session = Depends(get_db)):
   user_to_delete = db.query(User).where(User.id == id).first()
-  notes = db.query(Note).where(Note.user_id == id).all()
 
   if not user_to_delete:
     raise HTTPException(
@@ -66,7 +65,5 @@ def delete_user(id: int, db: Session = Depends(get_db)):
     )
   
   db.delete(user_to_delete)
-  for note in notes:
-    note.user_id = None
   db.commit()
   return user_to_delete
