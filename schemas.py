@@ -15,3 +15,6 @@ class UpdateNoteContent(BaseModel):
 
 class UpdateNoteUserId(BaseModel):
   user_id: Optional[int] = None
+
+class UpdateNoteIsDone(BaseModel):
+  is_done: bool = False

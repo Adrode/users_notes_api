@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models import User, Note
 from database import get_db
-from schemas import CreateNote, UpdateNoteContent, UpdateNoteUserId
+from schemas import CreateNote, UpdateNoteContent, UpdateNoteUserId, UpdateNoteIsDone
 
 router = APIRouter()
 
@@ -51,20 +51,35 @@ def update_note_user_id(id: int, update_user_id: UpdateNoteUserId, db: Session =
   db.refresh(note)
   return note
 
-@router.put("/{id}")
-def update_note_content(id: int, update_note_content: UpdateNoteContent, db: Session = Depends(get_db)):
-  updated_note = db.query(Note).where(Note.id == id).first()
+@router.put("/content/{id}")
+def update_note_content(id: int, update_content: UpdateNoteContent, db: Session = Depends(get_db)):
+  note = db.query(Note).where(Note.id == id).first()
 
-  if not updated_note:
+  if not note:
     raise HTTPException(
       status_code=404,
       detail="ID not found"
     )
 
-  updated_note.content = update_note_content.content
+  note.content = update_content.content
   db.commit()
-  db.refresh(updated_note)
-  return updated_note
+  db.refresh(note)
+  return note
+
+@router.put("/is_done/{id}")
+def update_note_is_done(id: int, update_is_done: UpdateNoteIsDone, db: Session = Depends(get_db)):
+  note = db.query(Note).where(Note.id == id).first()
+
+  if not note:
+    raise HTTPException(
+      status_code=404,
+      detail="ID not found"
+    )
+  
+  note.is_done = update_is_done.is_done
+  db.commit()
+  db.refresh(note)
+  return note
 
 @router.delete("/{id}")
 def delete_note(id: int, db: Session = Depends(get_db)):
