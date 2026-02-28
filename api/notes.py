@@ -6,15 +6,20 @@ from schemas import CreateNote, UpdateNoteContent, UpdateNoteUserId
 
 router = APIRouter()
 
-@router.get("/")
-def get_notes(db: Session = Depends(get_db)):
-  notes = db.query(Note).all()
+@router.get("/todo")
+def get_todo_notes(db: Session = Depends(get_db)):
+  notes = db.query(Note).where(Note.is_done == False).all()
   return notes
 
 @router.get("/{id}")
 def get_note(id: int, db: Session = Depends(get_db)):
   note = db.query(Note).where(Note.id == id).first()
   return note
+
+@router.get("/")
+def get_notes(db: Session = Depends(get_db)):
+  notes = db.query(Note).all()
+  return notes
 
 @router.post("/")
 def add_note(create_note: CreateNote, db: Session = Depends(get_db)):
@@ -30,6 +35,21 @@ def add_note(create_note: CreateNote, db: Session = Depends(get_db)):
   db.commit()
   db.refresh(new_note)
   return new_note
+
+@router.put("/user_id/{id}")
+def update_note_user_id(id: int, update_user_id: UpdateNoteUserId, db: Session = Depends(get_db)):
+  note = db.query(Note).where(Note.id == id).first()
+
+  if not note:
+    raise HTTPException(
+      status_code=404,
+      detail="ID not found"
+    )
+  
+  note.user_id = update_user_id.user_id
+  db.commit()
+  db.refresh(note)
+  return note
 
 @router.put("/{id}")
 def update_note_content(id: int, update_note_content: UpdateNoteContent, db: Session = Depends(get_db)):
@@ -59,18 +79,3 @@ def delete_note(id: int, db: Session = Depends(get_db)):
   db.delete(note_to_delete)
   db.commit()
   return note_to_delete
-
-@router.put("/user_id/{id}")
-def update_note_user_id(id: int, update_user_id: UpdateNoteUserId, db: Session = Depends(get_db)):
-  note = db.query(Note).where(Note.id == id).first()
-
-  if not note:
-    raise HTTPException(
-      status_code=404,
-      detail="ID not found"
-    )
-  
-  note.user_id = update_user_id.user_id
-  db.commit()
-  db.refresh(note)
-  return note
