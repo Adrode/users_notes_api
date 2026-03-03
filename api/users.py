@@ -4,8 +4,13 @@ from sqlalchemy.exc import IntegrityError
 from models import User, Note
 from database import get_db
 from schemas import CreateUser
+import schemas, models, auth
 
 router = APIRouter()
+
+@router.get("/me", response_model=schemas.UserOut)
+def get_me(current_user: models.User = Depends(auth.get_current_user)):
+  return current_user
 
 @router.get("/notes/{id}")
 def get_user_notes(id: int, db: Session = Depends(get_db)):
@@ -40,19 +45,19 @@ def get_users(db: Session = Depends(get_db)):
   users = db.query(User).all()
   return users
 
-@router.post("/")
-def add_user(create_user: CreateUser, db: Session = Depends(get_db)):
-  try:
-    new_user = User(email=create_user.email, name=create_user.name)
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
-  except IntegrityError:
-    raise HTTPException(
-      status_code=400,
-      detail="Unique constraint violated"
-    )
+#@router.post("/")
+#def add_user(create_user: CreateUser, db: Session = Depends(get_db)):
+#  try:
+#    new_user = User(email=create_user.email, name=create_user.name)
+#    db.add(new_user)
+#    db.commit()
+#    db.refresh(new_user)
+#    return new_user
+#  except IntegrityError:
+#    raise HTTPException(
+#      status_code=400,
+#      detail="Unique constraint violated"
+#    )
 
 @router.delete("/{id}")
 def delete_user(id: int, db: Session = Depends(get_db)):

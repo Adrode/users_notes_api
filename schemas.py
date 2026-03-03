@@ -4,6 +4,22 @@ from typing import Optional
 class CreateUser(BaseModel):
   email: EmailStr
   name: str
+  password: str
+
+class UserOut(BaseModel):
+  id: int
+  email: str
+  is_active: bool
+
+  class Config:
+    from_attributes: True
+
+class Token(BaseModel):
+  access_token: str
+  token_type: str
+
+class TokenData(BaseModel):
+  email: str | None = None
 
 class CreateNote(BaseModel):
   title: str
