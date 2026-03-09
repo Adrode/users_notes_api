@@ -7,7 +7,7 @@ from database import get_db
 
 router = APIRouter()
 
-@router.post("/register", response_model=schemas.UserOut, status_code=201)
+@router.post("/register", status_code=201)
 def register(user_data: schemas.CreateUser, db: Session = Depends(get_db)):
   if auth.get_user_by_email(db, user_data.email):
     raise HTTPException(
@@ -17,6 +17,7 @@ def register(user_data: schemas.CreateUser, db: Session = Depends(get_db)):
   
   user = models.User(
     email=user_data.email,
+    name=user_data.name,
     hashed_password=auth.hash_password(user_data.password)
   )
   db.add(user)

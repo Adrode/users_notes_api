@@ -6,14 +6,6 @@ class CreateUser(BaseModel):
   name: str
   password: str
 
-class UserOut(BaseModel):
-  id: int
-  email: str
-  is_active: bool
-
-  class Config:
-    from_attributes: True
-
 class Token(BaseModel):
   access_token: str
   token_type: str

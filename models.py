@@ -9,7 +9,7 @@ class User(Base):
   id = Column(Integer, primary_key=True)
   email = Column(String, nullable=False, unique=True)
   name = Column(String, nullable=False)
-  hashed_password = Column(String, nullable=False)
+  hashed_password = Column(String, nullable=True)
   is_active = Column(Boolean, default=True)
 
   notes = relationship('Note', back_populates='user', passive_deletes=True)

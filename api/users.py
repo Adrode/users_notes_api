@@ -1,14 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from models import User, Note
 from database import get_db
-from schemas import CreateUser
-import schemas, models, auth
+import models, auth
 
 router = APIRouter()
 
-@router.get("/me", response_model=schemas.UserOut)
+@router.get("/me")
 def get_me(current_user: models.User = Depends(auth.get_current_user)):
   return current_user
 
