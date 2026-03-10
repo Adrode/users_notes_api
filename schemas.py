@@ -27,6 +27,14 @@ class CreateNote(BaseModel):
   content: Optional[str] = None
   user_id: Optional[int] = None
 
+class Note(BaseModel):
+  title: str
+  content: str
+  is_done: bool
+
+  class Config:
+    from_attributes: True
+
 class UpdateNoteContent(BaseModel):
   content: Optional[str] = None
 

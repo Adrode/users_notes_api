@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models import User, Note
 from database import get_db
-import models, auth
+import models, schemas, auth
 
 router = APIRouter()
 
@@ -10,19 +10,13 @@ router = APIRouter()
 def get_me(current_user: models.User = Depends(auth.get_current_user)):
   return current_user
 
-@router.get("/notes/{id}")
-def get_user_notes(id: int, db: Session = Depends(get_db)):
-  user = db.query(User).where(User.id == id).first()
-
-  if not user:
-    raise HTTPException(
-      status_code=404,
-      detail="ID not found"
-    )
+@router.get("/notes", response_model=list[schemas.Note])
+def get_user_notes(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+  notes = db.query(Note).where(Note.user_id == current_user.id).all()
   
-  return {'user_name': user.name, 'notes': [{'title': element.title, 'content': element.content} for element in user.notes]}
+  return notes
 
-@router.get("/notes")
+@router.get("/all/notes")
 def get_all_users_notes(db: Session = Depends(get_db)):
   users_notes = db.query(Note).join(User).all()
   return [
