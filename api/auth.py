@@ -7,7 +7,7 @@ from database import get_db
 
 router = APIRouter()
 
-@router.post("/register", status_code=201)
+@router.post("/register", status_code=201, response_model=schemas.User)
 def register(user_data: schemas.CreateUser, db: Session = Depends(get_db)):
   if auth.get_user_by_email(db, user_data.email):
     raise HTTPException(
@@ -35,7 +35,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
       headers={"WWW-Authenticate": "Bearer"}
     )
   token = auth.create_access_token(
-    data={"sub": user.email},
-    expires_delta=timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    data={"sub": user.email}
   )
   return {"access_token": token, "token_type": "bearer"}

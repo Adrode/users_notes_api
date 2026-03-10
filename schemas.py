@@ -6,6 +6,15 @@ class CreateUser(BaseModel):
   name: str
   password: str
 
+class User(BaseModel):
+  user_id: int
+  email: EmailStr
+  name: str
+  is_active: bool
+
+  class Config:
+    from_attributes: True
+
 class Token(BaseModel):
   access_token: str
   token_type: str
