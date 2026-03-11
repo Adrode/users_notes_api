@@ -32,6 +32,9 @@ class Note(BaseModel):
   content: str
   is_done: bool
 
+  class Config:
+    from_attributes: True
+
 class UpdateNoteContent(BaseModel):
   content: Optional[str] = None
 
