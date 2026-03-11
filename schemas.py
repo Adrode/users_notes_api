@@ -7,10 +7,9 @@ class CreateUser(BaseModel):
   password: str
 
 class User(BaseModel):
-  user_id: int
+  id: int
   email: EmailStr
   name: str
-  is_active: bool
 
   class Config:
     from_attributes: True

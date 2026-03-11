@@ -7,7 +7,7 @@ from database import get_db
 
 router = APIRouter()
 
-@router.post("/register", status_code=201, response_model=schemas.User)
+@router.post("/register", response_model=schemas.User)
 def register(user_data: schemas.CreateUser, db: Session = Depends(get_db)):
   if auth.get_user_by_email(db, user_data.email):
     raise HTTPException(

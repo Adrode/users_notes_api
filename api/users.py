@@ -13,30 +13,41 @@ def get_me(current_user: models.User = Depends(auth.get_current_user)):
 @router.get("/notes", response_model=list[schemas.Note])
 def get_user_notes(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
   notes = db.query(Note).where(Note.user_id == current_user.id).all()
-  
   return notes
 
-@router.get("/all/notes")
-def get_all_users_notes(db: Session = Depends(get_db)):
-  users_notes = db.query(Note).join(User).all()
-  return [
-    {
-      'user_name': note.user.name,
-      'note_title': note.title,
-      'note_content': note.content
-    } for note in users_notes
-  ]
+@router.delete("/me")
+def delete_me(password: str, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+  user = db.query(User).where(User.id == current_user.id).first()
 
-@router.get("/{id}")
-def get_user(id: int, db: Session = Depends(get_db)):
-  user = db.query(User).where(User.id == id).first()
+  if not auth.verify_password(password, current_user.hashed_password):
+    raise HTTPException(
+      status_code=401,
+      detail="Not authenitcated"
+    )
+  
+  db.delete(user)
+  db.commit()
   return user
 
-@router.get("/")
-def get_users(db: Session = Depends(get_db)):
-  users = db.query(User).all()
-  return users
+# TO DELETE / ADMIN ENDPOINTS
+# @router.get("/all/notes")
+# def get_all_users_notes(db: Session = Depends(get_db)):
+#   users_notes = db.query(Note).join(User).all()
+#   return [
+#     {
+#       'user_name': note.user.name,
+#       'note_title': note.title,
+#       'note_content': note.content
+#     } for note in users_notes
+#   ]
 
+# TO DELETE / ADMIN ENDPOINTS
+# @router.get("/")
+# def get_users(db: Session = Depends(get_db)):
+#   users = db.query(User).all()
+#   return users
+
+# TO DELETE
 #@router.post("/")
 #def add_user(create_user: CreateUser, db: Session = Depends(get_db)):
 #  try:
@@ -50,17 +61,3 @@ def get_users(db: Session = Depends(get_db)):
 #      status_code=400,
 #      detail="Unique constraint violated"
 #    )
-
-@router.delete("/{id}")
-def delete_user(id: int, db: Session = Depends(get_db)):
-  user_to_delete = db.query(User).where(User.id == id).first()
-
-  if not user_to_delete:
-    raise HTTPException(
-      status_code=404,
-      detail="ID not found"
-    )
-  
-  db.delete(user_to_delete)
-  db.commit()
-  return user_to_delete
