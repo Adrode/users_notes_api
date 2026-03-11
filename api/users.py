@@ -10,11 +10,6 @@ router = APIRouter()
 def get_me(current_user: models.User = Depends(auth.get_current_user)):
   return current_user
 
-@router.get("/notes", response_model=list[schemas.Note])
-def get_user_notes(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
-  notes = db.query(Note).where(Note.user_id == current_user.id).all()
-  return notes
-
 @router.delete("/me")
 def delete_me(password: str, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
   user = db.query(User).where(User.id == current_user.id).first()

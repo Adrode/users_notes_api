@@ -7,7 +7,6 @@ import auth, schemas, models
 
 router = APIRouter()
 
-# TO REDO
 @router.post("/", response_model=schemas.Note)
 def add_note(create_note: CreateNote, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
   new_note = Note(
@@ -21,17 +20,22 @@ def add_note(create_note: CreateNote, db: Session = Depends(get_db), current_use
   db.refresh(new_note)
   return new_note
 
-# TO REDO
-@router.get("/todo")
-def get_todo_notes(db: Session = Depends(get_db)):
-  notes = db.query(Note).where(Note.is_done == False).all()
+@router.get("/", response_model=list[schemas.Note])
+def get_notes(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+  notes = db.query(Note).where(Note.user_id == current_user.id).all()
   return notes
 
 # TO REDO
-@router.get("/{id}")
-def get_note(id: int, db: Session = Depends(get_db)):
-  note = db.query(Note).where(Note.id == id).first()
-  return note
+# @router.get("/todo")
+# def get_todo_notes(db: Session = Depends(get_db)):
+#   notes = db.query(Note).where(Note.is_done == False).all()
+#   return notes
+
+# # TO REDO
+# @router.get("/{id}")
+# def get_note(id: int, db: Session = Depends(get_db)):
+#   note = db.query(Note).where(Note.id == id).first()
+#   return note
 
 # TO REDO TO GENERAL PATCH
 @router.put("/content/{id}")

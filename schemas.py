@@ -28,7 +28,6 @@ class CreateNote(BaseModel):
 class Note(BaseModel):
   title: str
   content: str
-  user_id: int
   is_done: bool
 
   class Config:
