@@ -24,11 +24,11 @@ class TokenData(BaseModel):
 class CreateNote(BaseModel):
   title: str
   content: Optional[str] = None
-  user_id: Optional[int] = None
 
 class Note(BaseModel):
   title: str
   content: str
+  user_id: int
   is_done: bool
 
   class Config:
@@ -36,9 +36,3 @@ class Note(BaseModel):
 
 class UpdateNoteContent(BaseModel):
   content: Optional[str] = None
-
-class UpdateNoteUserId(BaseModel):
-  user_id: Optional[int] = None
-
-class UpdateNoteIsDone(BaseModel):
-  is_done: bool = False
