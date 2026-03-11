@@ -26,6 +26,7 @@ class CreateNote(BaseModel):
   content: Optional[str] = None
 
 class Note(BaseModel):
+  id: int
   title: str
   content: str
   is_done: bool
