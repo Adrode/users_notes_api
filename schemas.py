@@ -14,13 +14,6 @@ class User(BaseModel):
   class Config:
     from_attributes: True
 
-class Token(BaseModel):
-  access_token: str
-  token_type: str
-
-class TokenData(BaseModel):
-  email: str | None = None
-
 class CreateNote(BaseModel):
   title: str
   content: Optional[str] = None
@@ -34,5 +27,14 @@ class Note(BaseModel):
   class Config:
     from_attributes: True
 
-class UpdateNoteContent(BaseModel):
+class UpdateNote(BaseModel):
+  title: str
   content: Optional[str] = None
+  is_done: Optional[bool] = False
+
+class Token(BaseModel):
+  access_token: str
+  token_type: str
+
+class TokenData(BaseModel):
+  email: str | None = None

@@ -2,13 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models import Note
 from database import get_db
-from schemas import CreateNote, UpdateNoteContent
 import auth, schemas, models
 
 router = APIRouter()
 
 @router.post("/", response_model=schemas.Note)
-def add_note(create_note: CreateNote, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+def add_note(
+    create_note: schemas.CreateNote,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+  ):
   new_note = Note(
     title=create_note.title,
     content=create_note.content,
@@ -21,7 +24,10 @@ def add_note(create_note: CreateNote, db: Session = Depends(get_db), current_use
   return new_note
 
 @router.get("/", response_model=list[schemas.Note])
-def get_notes(db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+def get_notes(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+  ):
   notes = db.query(Note).where(Note.user_id == current_user.id).all()
   return notes
 
@@ -38,17 +44,32 @@ def get_notes(db: Session = Depends(get_db), current_user: models.User = Depends
 #   return note
 
 # TO REDO TO GENERAL PATCH
-@router.put("/content/{id}")
-def update_note_content(id: int, update_content: UpdateNoteContent, db: Session = Depends(get_db)):
+@router.patch("/{id}", response_model=schemas.Note)
+def update_note_content(
+    id: int,
+    update_data: schemas.UpdateNote,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+  ):
   note = db.query(Note).where(Note.id == id).first()
+  print(f"LOG: {note}")
 
   if not note:
     raise HTTPException(
       status_code=404,
-      detail="ID not found"
+      detail="Not found"
     )
 
-  note.content = update_content.content
+  if not note.user_id == current_user.id:
+    raise HTTPException(
+      status_code=401,
+      detail="Not authorized"
+    )
+
+  update = update_data.model_dump(exclude_unset=True) # model_dump robi dict z obiektu, exclude_unset odrzuca właściwości które mają wartość None
+  for key, value in update.items():
+    setattr(note, key, value) # (object, właściwość do zmiany, nowa wartość)
+  # powyższe do zanotowania
   db.commit()
   db.refresh(note)
   return note
