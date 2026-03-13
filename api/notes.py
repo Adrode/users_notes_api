@@ -24,6 +24,28 @@ def add_note(
   db.refresh(new_note)
   return new_note
 
+@router.get("/{id}", response_model=schemas.Note)
+def get_note(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)  
+  ):
+  note = db.query(Note).where(Note.id == id).first()
+
+  if not note:
+    raise HTTPException(
+      status_code=404,
+      detail="Not found"
+    )
+  
+  if not note.user_id == current_user.id:
+    raise HTTPException(
+      status_code=401,
+      detail="Not authorized"
+    )
+  
+  return note
+
 @router.get("/", response_model=list[schemas.Note])
 def get_notes(
     db: Session = Depends(get_db),
@@ -32,8 +54,11 @@ def get_notes(
   notes = db.query(Note).where(Note.user_id == current_user.id).all()
   return notes
 
+# @router.patch("/is_done/{id}")
+# def update_note
+
 @router.patch("/{id}", response_model=schemas.Note)
-def update_note_content(
+def update_note(
     id: int,
     update_data: schemas.UpdateNote,
     db: Session = Depends(get_db),
@@ -61,7 +86,6 @@ def update_note_content(
   db.refresh(note)
   return note
 
-# TO REDO
 @router.delete("/{id}", response_model=schemas.Note)
 def delete_note(
     id: int,
