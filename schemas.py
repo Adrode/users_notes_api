@@ -32,6 +32,9 @@ class UpdateNote(BaseModel):
   content: Optional[str] = None
   is_done: Optional[bool] = False
 
+class UpdateNoteIsDone(BaseModel):
+  is_done: bool = False
+
 class Token(BaseModel):
   access_token: str
   token_type: str

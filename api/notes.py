@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import InvalidRequestError
 from models import Note
 from database import get_db
 import auth, schemas, models
+from my_exceptions import note_exception, user_id_exception
 
 router = APIRouter()
 
@@ -33,16 +33,10 @@ def get_note(
   note = db.query(Note).where(Note.id == id).first()
 
   if not note:
-    raise HTTPException(
-      status_code=404,
-      detail="Not found"
-    )
+    raise note_exception
   
   if not note.user_id == current_user.id:
-    raise HTTPException(
-      status_code=401,
-      detail="Not authorized"
-    )
+    raise user_id_exception
   
   return note
 
@@ -54,8 +48,25 @@ def get_notes(
   notes = db.query(Note).where(Note.user_id == current_user.id).all()
   return notes
 
-# @router.patch("/is_done/{id}")
-# def update_note
+@router.patch("/is_done/{id}", response_model=schemas.Note)
+def update_note_is_done(
+    id: int,
+    update_data: schemas.UpdateNoteIsDone,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)
+  ):
+  note = db.query(Note).where(Note.id == id).first()
+
+  if not note:
+    raise note_exception
+  
+  if not note.user_id == current_user.id:
+    raise user_id_exception
+  
+  note.is_done = update_data.is_done
+  db.commit()
+  db.refresh(note)
+  return note
 
 @router.patch("/{id}", response_model=schemas.Note)
 def update_note(
@@ -67,18 +78,12 @@ def update_note(
   note = db.query(Note).where(Note.id == id).first()
 
   if not note:
-    raise HTTPException(
-      status_code=404,
-      detail="Not found"
-    )
-
+    raise note_exception
+  
   if not note.user_id == current_user.id:
-    raise HTTPException(
-      status_code=401,
-      detail="Not authorized"
-    )
+    raise user_id_exception
 
-  update = update_data.model_dump(exclude_unset=True) # model_dump robi dict z obiektu, exclude_unset odrzuca właściwości które mają wartość None
+  update = update_data.model_dump(exclude_unset=True) # model_dump robi dict z obiektu, exclude_unset usuwa pola których nie było w request body
   for key, value in update.items():
     setattr(note, key, value) # (object, właściwość do zmiany, nowa wartość)
   # powyższe do zanotowania
@@ -95,16 +100,10 @@ def delete_note(
   note = db.query(Note).where(Note.id == id).first()
 
   if not note:
-    raise HTTPException(
-      status_code=404,
-      detail="ID not found"
-    )
+    raise note_exception
   
   if not note.user_id == current_user.id:
-    raise HTTPException(
-      status_code=401,
-      detail="Not authorized"
-    )
+    raise user_id_exception
 
   db.delete(note)
   db.commit()
