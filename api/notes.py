@@ -32,18 +32,6 @@ def get_notes(
   notes = db.query(Note).where(Note.user_id == current_user.id).all()
   return notes
 
-# TO REDO
-# @router.get("/todo")
-# def get_todo_notes(db: Session = Depends(get_db)):
-#   notes = db.query(Note).where(Note.is_done == False).all()
-#   return notes
-
-# # TO REDO
-# @router.get("/{id}")
-# def get_note(id: int, db: Session = Depends(get_db)):
-#   note = db.query(Note).where(Note.id == id).first()
-#   return note
-
 @router.patch("/{id}", response_model=schemas.Note)
 def update_note_content(
     id: int,
