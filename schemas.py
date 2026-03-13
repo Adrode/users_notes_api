@@ -28,7 +28,7 @@ class Note(BaseModel):
     from_attributes: True
 
 class UpdateNote(BaseModel):
-  title: str
+  title: Optional[str] = None
   content: Optional[str] = None
   is_done: Optional[bool] = False
 

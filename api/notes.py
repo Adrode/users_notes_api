@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import InvalidRequestError
 from models import Note
 from database import get_db
 import auth, schemas, models
@@ -43,7 +44,6 @@ def get_notes(
 #   note = db.query(Note).where(Note.id == id).first()
 #   return note
 
-# TO REDO TO GENERAL PATCH
 @router.patch("/{id}", response_model=schemas.Note)
 def update_note_content(
     id: int,
@@ -52,7 +52,6 @@ def update_note_content(
     current_user: models.User = Depends(auth.get_current_user)
   ):
   note = db.query(Note).where(Note.id == id).first()
-  print(f"LOG: {note}")
 
   if not note:
     raise HTTPException(
@@ -75,22 +74,26 @@ def update_note_content(
   return note
 
 # TO REDO
-@router.delete("/{id}")
-def delete_note(id: int, db: Session = Depends(get_db)):
-  note_to_delete = db.query(Note).where(Note.id == id).first()
+@router.delete("/{id}", response_model=schemas.Note)
+def delete_note(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_user)  
+  ):
+  note = db.query(Note).where(Note.id == id).first()
 
-  if not note_to_delete:
+  if not note:
     raise HTTPException(
       status_code=404,
       detail="ID not found"
     )
+  
+  if not note.user_id == current_user.id:
+    raise HTTPException(
+      status_code=401,
+      detail="Not authorized"
+    )
 
-  db.delete(note_to_delete)
+  db.delete(note)
   db.commit()
-  return note_to_delete
-
-# TO DELETE / ADMIN
-# @router.get("/")
-# def get_notes(db: Session = Depends(get_db)):
-#   notes = db.query(Note).all()
-#   return notes
+  return note
