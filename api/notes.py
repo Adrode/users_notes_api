@@ -1,11 +1,20 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models import Note
 from database import get_db
 import auth, schemas, models
-from my_exceptions import note_exception, user_id_exception
 
 router = APIRouter()
+
+note_exception = HTTPException(
+  status_code=404,
+  detail="Not found"
+)
+
+user_id_exception = HTTPException(
+  status_code=401,
+  detail="Not authorized"
+)
 
 @router.post("/", response_model=schemas.Note)
 def add_note(
