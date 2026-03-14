@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from database import get_db
@@ -35,7 +35,9 @@ def verify_password(plain: str, hashed: str) -> bool:
 # USERS
 # -------------------
 def get_user_by_email(db: Session, email: str):
-  return db.query(models.User).where(models.User.email == email).first()
+  user = db.query(models.User).where(models.User.email == email).first()
+  print(f"LOG: {user}")
+  return user
 
 def authenticate_user(db: Session, email: str, password: str):
   user = get_user_by_email(db, email)
@@ -66,7 +68,7 @@ def get_current_user(
     db: Session = Depends(get_db)
 ):
   credentials_exception = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
+    status_code=401,
     detail="Could not validate credentials",
     headers={"WWW-Authenticate": "Bearer"}
   )
@@ -81,5 +83,11 @@ def get_current_user(
   user = get_user_by_email(db, email)
   if user is None:
     raise credentials_exception
+  if not user.is_active:
+    raise HTTPException(
+      status_code=401,
+      detail="Account is inactive",
+      headers={"WWW-Authenticate": "Bearer"}
+    )
   return user
 # -------------------
