@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models import Note
 from database import get_db
 import auth, schemas, models
 
@@ -22,7 +21,7 @@ def add_note(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)
   ):
-  new_note = Note(
+  new_note = models.Note(
     title=create_note.title,
     content=create_note.content,
     user_id=current_user.id
@@ -39,7 +38,7 @@ def get_note(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)  
   ):
-  note = db.query(Note).where(Note.id == id).first()
+  note = db.query(models.Note).where(models.Note.id == id).first()
 
   if not note:
     raise note_exception
@@ -54,7 +53,7 @@ def get_notes(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)
   ):
-  notes = db.query(Note).where(Note.user_id == current_user.id).all()
+  notes = db.query(models.Note).where(models.Note.user_id == current_user.id).all()
   return notes
 
 @router.patch("/is_done/{id}", response_model=schemas.Note)
@@ -64,7 +63,7 @@ def update_note_is_done(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)
   ):
-  note = db.query(Note).where(Note.id == id).first()
+  note = db.query(models.Note).where(models.Note.id == id).first()
 
   if not note:
     raise note_exception
@@ -84,7 +83,7 @@ def update_note(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)
   ):
-  note = db.query(Note).where(Note.id == id).first()
+  note = db.query(models.Note).where(models.Note.id == id).first()
 
   if not note:
     raise note_exception
@@ -106,7 +105,7 @@ def delete_note(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)  
   ):
-  note = db.query(Note).where(Note.id == id).first()
+  note = db.query(models.Note).where(models.Note.id == id).first()
 
   if not note:
     raise note_exception

@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import timedelta
 import models, schemas, auth
 from database import get_db
 
@@ -36,7 +35,7 @@ def login(
   user = auth.authenticate_user(db, form_data.username, form_data.password)
   if not user:
     raise HTTPException(
-      status_code=status.HTTP_401_UNAUTHORIZED,
+      status_code=401,
       detail="Incorrect email or password",
       headers={"WWW-Authenticate": "Bearer"}
     )

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models import User, Note
 from database import get_db
-import models, schemas, auth
+import models, auth
 
 router = APIRouter()
 
@@ -16,7 +15,7 @@ def delete_me(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user)
   ):
-  user = db.query(User).where(User.id == current_user.id).first()
+  user = db.query(models.User).where(models.User.id == current_user.id).first()
 
   if not auth.verify_password(password, current_user.hashed_password):
     raise HTTPException(
