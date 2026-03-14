@@ -41,3 +41,9 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
   email: str | None = None
+
+class AdminUpdateUser(BaseModel):
+  email: Optional[EmailStr] = None
+  name: Optional[str] = None
+  is_active: Optional[bool] = False
+  is_admin: Optional[bool] = False

@@ -17,10 +17,10 @@ user_id_exception = HTTPException(
 
 @router.post("/", response_model=schemas.Note)
 def add_note(
-    create_note: schemas.CreateNote,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_user)
-  ):
+  create_note: schemas.CreateNote,
+  db: Session = Depends(get_db),
+  current_user: models.User = Depends(auth.get_current_user)
+):
   new_note = models.Note(
     title=create_note.title,
     content=create_note.content,
@@ -34,10 +34,10 @@ def add_note(
 
 @router.get("/{id}", response_model=schemas.Note)
 def get_note(
-    id: int,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_user)  
-  ):
+  id: int,
+  db: Session = Depends(get_db),
+  current_user: models.User = Depends(auth.get_current_user)  
+):
   note = db.query(models.Note).where(models.Note.id == id).first()
 
   if not note:
@@ -50,19 +50,19 @@ def get_note(
 
 @router.get("/", response_model=list[schemas.Note])
 def get_notes(
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_user)
-  ):
+  db: Session = Depends(get_db),
+  current_user: models.User = Depends(auth.get_current_user)
+):
   notes = db.query(models.Note).where(models.Note.user_id == current_user.id).all()
   return notes
 
 @router.patch("/is_done/{id}", response_model=schemas.Note)
 def update_note_is_done(
-    id: int,
-    update_data: schemas.UpdateNoteIsDone,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_user)
-  ):
+  id: int,
+  update_data: schemas.UpdateNoteIsDone,
+  db: Session = Depends(get_db),
+  current_user: models.User = Depends(auth.get_current_user)
+):
   note = db.query(models.Note).where(models.Note.id == id).first()
 
   if not note:
@@ -78,11 +78,11 @@ def update_note_is_done(
 
 @router.patch("/{id}", response_model=schemas.Note)
 def update_note(
-    id: int,
-    update_data: schemas.UpdateNote,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_user)
-  ):
+  id: int,
+  update_data: schemas.UpdateNote,
+  db: Session = Depends(get_db),
+  current_user: models.User = Depends(auth.get_current_user)
+):
   note = db.query(models.Note).where(models.Note.id == id).first()
 
   if not note:
@@ -101,10 +101,10 @@ def update_note(
 
 @router.delete("/{id}", response_model=schemas.Note)
 def delete_note(
-    id: int,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_user)  
-  ):
+  id: int,
+  db: Session = Depends(get_db),
+  current_user: models.User = Depends(auth.get_current_user)  
+):
   note = db.query(models.Note).where(models.Note.id == id).first()
 
   if not note:
