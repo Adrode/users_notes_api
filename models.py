@@ -8,7 +8,8 @@ class User(Base):
   email = Column(String, nullable=False, unique=True)
   name = Column(String, nullable=False)
   hashed_password = Column(String(255), nullable=False)
-  is_active = Column(Boolean, default=True)
+  is_active = Column(Boolean, default=True, nullable=False)
+  is_admin = Column(Boolean, default=False, nullable=False)
 
   notes = relationship('Note', back_populates='user', passive_deletes=True)
 
