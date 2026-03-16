@@ -91,3 +91,16 @@ def get_current_user(
     )
   return user
 # -------------------
+
+# CURRENT ADMIN
+# -------------------
+def get_current_admin(
+  current_user: models.User = Depends(get_current_user)
+):
+  if not current_user.is_admin:
+    raise HTTPException(
+      status_code=401,
+      detail="Not authorized"
+    )
+  return current_user
+# -------------------

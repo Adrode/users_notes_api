@@ -6,31 +6,21 @@ import models, schemas, auth
 
 router = APIRouter()
 
-is_admin_exception = HTTPException(
-  status_code=401,
-  detail="Not authorized"
-)
-
 @router.get("/users")
 def get_users(
   db: Session = Depends(get_db),
-  current_user: models.User = Depends(auth.get_current_user)
+  admin: models.User = Depends(auth.get_current_admin)
 ):
-  if not current_user.is_admin:
-    raise is_admin_exception
   return db.query(models.User).all()
 
-@router.patch("/users")
+@router.patch("/users/{id}")
 def update_user(
   id: int,
   update_data: schemas.AdminUpdateUser,
   db: Session = Depends(get_db),
-  current_user: models.User = Depends(auth.get_current_user)
+  admin: models.User = Depends(auth.get_current_admin)
 ):
   try:
-    if not current_user.is_admin:
-      raise is_admin_exception
-    
     user = db.query(models.User).where(models.User.id == id).first()
 
     update = update_data.model_dump(exclude_unset=True)
@@ -45,15 +35,12 @@ def update_user(
       detail="Bad request"
     )
   
-@router.delete("/users")
+@router.delete("/users/{id}")
 def delete_user(
   id: int,
   db: Session = Depends(get_db),
-  current_user: models.User = Depends(auth.get_current_user)
+  admin: models.User = Depends(auth.get_current_admin)
 ):
-  if not current_user.is_admin:
-    raise is_admin_exception
-  
   user = db.query(models.User).where(models.User.id == id).first()
 
   db.delete(user)
