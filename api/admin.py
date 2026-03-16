@@ -46,3 +46,10 @@ def delete_user(
   db.delete(user)
   db.commit()
   return user
+
+@router.get("/notes")
+def get_notes(
+  db: Session = Depends(get_db),
+  admin: models.User = Depends(auth.get_current_admin)
+):
+  return db.query(models.Note).join(models.User).all()
