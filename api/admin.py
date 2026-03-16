@@ -53,3 +53,16 @@ def get_notes(
   admin: models.User = Depends(auth.get_current_admin)
 ):
   return db.query(models.Note).join(models.User).all()
+
+@router.get("/notes/{user_id}")
+def get_notes_by_user_id(
+  user_id: int,
+  db: Session = Depends(get_db),
+  admin: models.User = Depends(auth.get_current_admin)
+):
+  user = db.query(models.User).where(models.User.id == user_id).first()
+  
+  return {
+    "username": user.name,
+    "notes": user.notes
+  }
