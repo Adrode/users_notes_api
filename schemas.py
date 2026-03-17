@@ -47,3 +47,9 @@ class AdminUpdateUser(BaseModel):
   name: Optional[str] = None
   is_active: Optional[bool] = False
   is_admin: Optional[bool] = False
+
+class AdminUpdateNote(BaseModel):
+  title: Optional[str] = None
+  content: Optional[str] = None
+  user_id: Optional[int] = None
+  is_done: Optional[bool] = None

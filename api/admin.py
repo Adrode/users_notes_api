@@ -23,6 +23,12 @@ def update_user(
   try:
     user = db.query(models.User).where(models.User.id == id).first()
 
+    if not user:
+      raise HTTPException(
+        status_code=404,
+        detail="Not found"
+      )
+
     update = update_data.model_dump(exclude_unset=True)
     for key, value in update.items():
       setattr(user, key, value)
@@ -62,7 +68,41 @@ def get_notes_by_user_id(
 ):
   user = db.query(models.User).where(models.User.id == user_id).first()
   
+  if not user:
+    raise HTTPException(
+      status_code=404,
+      detail="Not found"
+    )
+
   return {
     "username": user.name,
     "notes": user.notes
   }
+
+@router.patch("/notes/{id}")
+def update_note(
+  id: int,
+  update_data: schemas.AdminUpdateNote,
+  db: Session = Depends(get_db),
+  admin: models.User = Depends(auth.get_current_admin)
+):
+  try:
+    note = db.query(models.Note).where(models.Note.id == id).first()
+
+    if not note:
+      raise HTTPException(
+        status_code=404,
+        detail="Not found"
+      )
+    
+    update = update_data.model_dump(exclude_unset=True)
+    for key, value in update.items():
+      setattr(note, key, value)
+    db.commit()
+    db.refresh(note)
+    return note
+  except IntegrityError:
+    raise HTTPException(
+      status_code=400,
+      detail="Bad request"
+    )
