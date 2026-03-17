@@ -12,7 +12,7 @@ class User(BaseModel):
   name: str
 
   class Config:
-    from_attributes: True
+    from_attributes = True
 
 class CreateNote(BaseModel):
   title: str
@@ -22,16 +22,16 @@ class CreateNote(BaseModel):
 class Note(BaseModel):
   id: int
   title: str
-  content: str
+  content: Optional[str] = None
   is_done: bool
 
   class Config:
-    from_attributes: True
+    from_attributes = True
 
 class UpdateNote(BaseModel):
   title: Optional[str] = None
   content: Optional[str] = None
-  is_done: Optional[bool] = False
+  is_done: Optional[bool] = None
 
 class UpdateNoteIsDone(BaseModel):
   is_done: bool = False
@@ -46,8 +46,8 @@ class TokenData(BaseModel):
 class AdminUpdateUser(BaseModel):
   email: Optional[EmailStr] = None
   name: Optional[str] = None
-  is_active: Optional[bool] = False
-  is_admin: Optional[bool] = False
+  is_active: Optional[bool] = None
+  is_admin: Optional[bool] = None
 
 class AdminUpdateNote(BaseModel):
   title: Optional[str] = None

@@ -72,6 +72,12 @@ def delete_user(
 ):
   user = db.query(models.User).where(models.User.id == id).first()
 
+  if not user:
+    raise HTTPException(
+      status_code=404,
+      detail="Not found"
+    )
+
   db.delete(user)
   db.commit()
   return user
@@ -160,6 +166,12 @@ def delete_note(
   admin: models.User = Depends(auth.get_current_admin)
 ):
   note = db.query(models.Note).where(models.Note.id == id).first()
+
+  if not note:
+    raise HTTPException(
+      status_code=404,
+      detail="Not found"
+    )
 
   if not note:
     raise HTTPException(

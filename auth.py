@@ -8,7 +8,7 @@ from database import get_db
 import models
 
 # JWT config
-SECRET_KEY = "AD8Afkhas!mvj73KMVEW&ASD1@D631$#8ASsdaASD612J#1@9312ASDsada"
+SECRET_KEY = "dev-secret-key_to_change_in_production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
     # bez sekretu i algorytmu praktycznie nie da się złamać JWT, więc powinny być one ukryte w aplikacji
@@ -36,7 +36,6 @@ def verify_password(plain: str, hashed: str) -> bool:
 # -------------------
 def get_user_by_email(db: Session, email: str):
   user = db.query(models.User).where(models.User.email == email).first()
-  print(f"LOG: {user}")
   return user
 
 def authenticate_user(db: Session, email: str, password: str):
