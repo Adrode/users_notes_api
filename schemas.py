@@ -17,6 +17,7 @@ class User(BaseModel):
 class CreateNote(BaseModel):
   title: str
   content: Optional[str] = None
+  user_id: int
 
 class Note(BaseModel):
   id: int

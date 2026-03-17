@@ -79,6 +79,29 @@ def get_notes_by_user_id(
     "notes": user.notes
   }
 
+@router.post("/notes")
+def add_note(
+  create_note: schemas.CreateNote,
+  db: Session = Depends(get_db),
+  admin: models.User = Depends(auth.get_current_admin)
+):
+  try:
+    note = models.Note(
+      title=create_note.title,
+      content=create_note.content,
+      user_id=create_note.user_id
+    )
+
+    db.add(note)
+    db.commit()
+    db.refresh(note)
+    return note
+  except IntegrityError:
+    raise HTTPException(
+      status_code=400,
+      detail="Bad request"
+    )
+
 @router.patch("/notes/{id}")
 def update_note(
   id: int,
@@ -106,3 +129,21 @@ def update_note(
       status_code=400,
       detail="Bad request"
     )
+
+@router.delete("/notes/{id}")
+def delete_note(
+  id: int,
+  db: Session = Depends(get_db),
+  admin: models.User = Depends(auth.get_current_admin)
+):
+  note = db.query(models.Note).where(models.Note.id == id).first()
+
+  if not note:
+    raise HTTPException(
+      status_code=404,
+      detail="Not found"
+    )
+  
+  db.delete(note)
+  db.commit()
+  return note
