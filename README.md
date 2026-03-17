@@ -1,6 +1,9 @@
 # Users & Notes API
 
-Simple REST API built with FastAPI for managing users and their notes with authentication and admin features.
+A FastAPI REST API project for managing users and notes. Integrates PostgreSQL, presents role-based access and JWT authentication.
+First portfolio project.
+
+![Swagger endpoints screenshot](users_notes_swagger.png)
 
 ## Features
 
