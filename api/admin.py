@@ -13,6 +13,29 @@ def get_users(
 ):
   return db.query(models.User).all()
 
+@router.post("/users")
+def add_user(
+  create_user: schemas.CreateUser,
+  db: Session = Depends(get_db),
+  admin: models.User = Depends(auth.get_current_admin)
+):
+  try:
+    user = models.User(
+      email=create_user.email,
+      name=create_user.name,
+      hashed_password=auth.hash_password(create_user.password)
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+  except IntegrityError:
+    raise HTTPException(
+      status_code=400,
+      detail="Bad request"
+    )
+
 @router.patch("/users/{id}")
 def update_user(
   id: int,
