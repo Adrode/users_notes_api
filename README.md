@@ -27,6 +27,16 @@ First portfolio project.
 
 ## Run
 
+Before running the app, make sure Docker is available and the PostgreSQL container is started. If you have database migrations, apply them with Alembic before launching the server.
+
+```bash
+docker compose up -d
+source env/bin/activate
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn main:app --reload
+```
+
 ```bash
 git clone https://github.com/Adrode/fastapi_users_notes_api.git
 cd users_notes_api
